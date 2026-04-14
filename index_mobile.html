@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#121212">
+    <link rel="apple-touch-icon" href="app_icon.png">
+    <link rel="icon" type="image/png" href="app_icon.png">
+    <link rel="manifest" href="manifest.json">
+    <title>Garden Manager Mobile</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- COPY FROM style.css --- */
+        :root {
+            --primary: #2ECC71;
+            --primary-dark: #27ae60;
+            --secondary: #95a5a6;
+            --bg-dark: #121212;
+            --bg-light: #f5f6fa;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-white: #ffffff;
+            --text-gray: #b2bec3;
+            --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --transition: all 0.3s ease;
+            --font-primary: 'Inter', sans-serif;
+            --font-heading: 'Outfit', sans-serif;
+        }
+
+        body.light-mode {
+            --bg: #f5f6fa;
+            --text: #2d3436;
+            --card-bg: #ffffff;
+            --card-border: rgba(0,0,0,0.1);
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode {
+            --bg: #121212;
+            --text: #ffffff;
+            --card-bg: #1e1e1e;
+            --card-border: rgba(255,255,255,0.1);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            height: 100vh;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1.5rem;
+            transition: var(--transition);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 3rem;
+        }
+
+        .brand .logo { font-size: 2rem; }
+        .brand h1 {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .nav-menu { flex: 1; overflow-y: auto; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+            transition: var(--transition);
+            gap: 0.75rem;
+            color: var(--text-gray);
+        }
+
+        .nav-item.active, .nav-item:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-separator {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-gray);
+            margin: 1.5rem 0 0.75rem 1rem;
+            letter-spacing: 1px;
+        }
+
+        .file-controls {
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .file-label {
+            font-size: 0.75rem;
+            color: var(--text-gray);
+            margin-top: 0.5rem;
+            text-align: center;
+            word-break: break-all;
+        }
+
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem 3rem;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            gap: 2rem;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 500px;
+            position: relative;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-gray);
+        }
+
+        .search-container input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            color: var(--text);
+            outline: none;
+        }
+
+        .user-actions { display: flex; gap: 1rem; align-items: center; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--card-border);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover { transform: translateY(-5px); box-shadow: var(--card-shadow); }
+        .stat-value { font-size: 2rem; font-weight: 700; color: var(--primary); }
+        .stat-label { font-size: 0.875rem; color: var(--text-gray); }
+        .stat-card.urgent .stat-value { color: #e74c3c; }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .content-header h2 { font-family: var(--font-heading); font-weight: 600; }
+
+        .plant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .plant-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            overflow: hidden;
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        .plant-card:hover { transform: translateY(-8px); box-shadow: var(--card-shadow); }
+
+        .plant-image {
+            height: 120px;
+            background: rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .plant-info { padding: 1.25rem; }
+        .plant-genus-tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            background: var(--primary);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .plant-name { font-weight: 600; font-size: 1.1rem; margin-bottom: 0.25rem; }
+        .plant-species { font-size: 0.85rem; color: var(--text-gray); font-style: italic; }
+
+        .plant-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .btn {
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-secondary { background: var(--secondary); color: white; }
+        .btn-secondary.active { background: var(--primary); }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-add { background: var(--primary); color: white; }
+        .btn-icon { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text); padding: 0.6rem; }
+
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+            padding: 1rem;
+        }
+
+        .modal-content.glass {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 2rem;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .close-modal { background: none; border: none; color: var(--text); font-size: 2rem; cursor: pointer; }
+
+        .form-group { margin-bottom: 1.25rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        label { display: block; margin-bottom: 0.4rem; font-size: 0.85rem; color: var(--text-gray); }
+        input, select, textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--card-border);
+            padding: 0.7rem 1rem;
+            border-radius: 10px;
+            color: var(--text);
+            outline: none;
+            font-family: inherit;
+        }
+
+        .plant-children {
+            padding: 1rem;
+            margin-top: auto;
+            border-top: 1px solid var(--card-border);
+            background: rgba(0,0,0,0.02);
+        }
+
+        .children-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-gray);
+            text-transform: uppercase;
+        }
+
+        .child-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .child-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0.8rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            font-size: 0.85rem;
+        }
+
+        .badge-count {
+            background: var(--primary);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-left: 0.5rem;
+        }
+
+        .btn-xs { padding: 0.3rem 0.5rem; font-size: 0.7rem; border-radius: 6px; }
+        .btn-sm { padding: 0.4rem 0.6rem; font-size: 0.8rem; border-radius: 8px; }
+
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* --- MOBILE RESPONSIVE --- */
+        @media (max-width: 768px) {
+            body { height: auto; overflow: auto; }
+            .app-container { flex-direction: column; height: auto; }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--card-border);
+                padding: 1rem 1.5rem;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+            }
+            .brand { margin-bottom: 1rem; }
+            .nav-menu { display: none; } /* Hide complicated nav on mobile for now */
+            
+            .main-content { padding: 1.5rem; overflow-y: visible; }
+            .top-bar { flex-direction: column; gap: 1rem; margin-bottom: 2rem; }
+            .search-container { max-width: 100%; }
+            .user-actions { width: 100%; justify-content: space-between; }
+            .user-actions .btn-add { flex: 1; }
+
+            .stats-grid { grid-template-columns: 1fr; gap: 1rem; margin-bottom: 2rem; }
+            .plant-grid { grid-template-columns: 1fr; }
+            
+            .form-row { grid-template-columns: 1fr; gap: 0; }
+            .modal-content.glass { padding: 1.5rem; border-radius: 16px; margin: 1rem; }
+            
+            .file-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; padding-top: 1rem; }
+            .file-controls button { width: 100% !important; margin: 0 !important; font-size: 0.8rem; padding: 0.5rem; }
+            .file-label { grid-column: span 2; }
+            
+            .plant-grid.list .plant-card { flex-direction: column; }
+            .plant-grid.list .plant-image { width: 100%; height: 120px; }
+            .plant-grid.list .plant-children { border-left: none; border-top: 1px solid var(--card-border); }
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo">🌿</div>
+                <h1>Garden Manager</h1>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item active" id="nav-all">
+                    <span class="icon">🏘️</span>
+                    <span class="label">Tất cả cây</span>
+                </div>
+                <div class="nav-item" id="nav-active">
+                    <span class="icon">🪴</span>
+                    <span class="label">Đang trồng</span>
+                </div>
+                <div class="nav-separator">Phân loại</div>
+                <div id="genus-list"></div>
+            </nav>
+            <div class="file-controls">
+                <button id="btn-open-file" class="btn btn-primary">
+                    <span class="icon">📂</span> Mở file
+                </button>
+                <button id="btn-save-file" class="btn btn-success" disabled>
+                    <span class="icon">💾</span> Lưu file
+                </button>
+                <button id="btn-export-file" class="btn btn-secondary" style="margin-top: 0.5rem;">
+                    <span class="icon">📤</span> Xuất file
+                </button>
+                <div id="current-file-label" class="file-label">Chưa chọn file</div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="search-input" placeholder="Tìm kiếm...">
+                </div>
+                <div class="user-actions">
+                    <button id="btn-filter-all" class="btn btn-secondary btn-sm active">Tất cả</button>
+                    <button id="btn-filter-active" class="btn btn-secondary btn-sm">🪴 Đang trồng</button>
+                    <button id="btn-add-plant" class="btn btn-add">
+                        <span class="icon">➕</span>
+                    </button>
+                    <button id="theme-toggle" class="btn btn-icon">
+                        <span id="theme-icon">🌙</span>
+                    </button>
+                </div>
+            </header>
+
+            <section class="dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total">0</div>
+                        <div class="stat-label">Tổng số loài</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-watered">0</div>
+                        <div class="stat-label">Đã tưới hôm nay</div>
+                    </div>
+                    <div class="stat-card urgent">
+                        <div class="stat-value" id="stat-urgent">0</div>
+                        <div class="stat-label">Cần tưới ngay</div>
+                    </div>
+                </div>
+
+                <div class="content-header">
+                    <h2 id="view-title">Tất cả cây cảnh</h2>
+                    <div class="view-options">
+                        <button class="view-btn active" data-view="grid">Grid</button>
+                        <button class="view-btn" data-view="list">List</button>
+                    </div>
+                </div>
+
+                <div id="plant-grid" class="plant-grid">
+                    <div class="loading-state">
+                        <p>Vui lòng mở file XML để bắt đầu...</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Modal -->
+        <div id="plant-modal" class="modal">
+            <div class="modal-content glass">
+                <div class="modal-header">
+                    <h2 id="modal-title">Thêm cây mới</h2>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="plant-form">
+                        <div class="form-group">
+                            <label for="plant-name">Tên cây / Chậu</label>
+                            <input type="text" id="plant-name" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="plant-genus">Chi (Genus)</label>
+                                <select id="plant-genus" required>
+                                    <option value="" disabled selected>-- Chọn Chi --</option>
+                                    <option value="Monstera">Monstera</option>
+                                    <option value="Philodendron">Philodendron</option>
+                                    <option value="Epipremnum">Epipremnum</option>
+                                    <option value="Scindapsus">Scindapsus</option>
+                                    <option value="Thaumatophyllum">Thaumatophyllum</option>
+                                    <option value="PlantBase">Khác</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="plant-species">Loài (Species)</label>
+                                <input type="text" id="plant-species">
+                            </div>
+                        </div>
+                        <div id="dynamic-fields"></div>
+                        
+                        <div class="form-group">
+                            <label for="plant-propagation">Phương pháp nhân giống</label>
+                            <select id="plant-propagation">
+                                <option value="">-- Không --</option>
+                                <option value="Water Propagation">Water Propagation</option>
+                                <option value="Air Layering">Air Layering</option>
+                                <option value="Division">Division</option>
+                                <option value="Seeds">Seeds</option>
+                                <option value="Tissue Culture">Tissue Culture</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="mother-plant-container" style="display: none;">
+                            <label for="mother-plant">Cây mẹ</label>
+                            <select id="mother-plant"></select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="plant-nickname">Biệt danh</label>
+                            <input type="text" id="plant-nickname">
+                        </div>
+                        <div class="form-group">
+                            <label for="plant-note">Ghi chú</label>
+                            <textarea id="plant-note" rows="3"></textarea>
+                        </div>
+                        <div class="form-actions" style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <button type="button" class="btn btn-secondary close-modal" style="flex:1">Hủy</button>
+                            <button type="submit" class="btn btn-primary" style="flex:1">Lưu</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden File Input for Mobile Fallback -->
+    <input type="file" id="file-input-fallback" style="display:none" accept=".xml">
+
+    <!-- Dependencies -->
+    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+
+    <script>
+        /* --- COPY FROM db.js --- */
+        const GardenDB = new Dexie("PortableGardenDatabase");
+        GardenDB.version(1).stores({ plants: "id, parentId, name, type, scientificName" });
+        GardenDB.version(2).stores({ plants: "id, parentId, name, type, scientificName", config: "key" });
+        const DatabaseService = {
+            getAllPlants: async function() { try { return await GardenDB.plants.toArray(); } catch (err) { return []; } },
+            savePlants: async function(plants) { try { await GardenDB.plants.bulkPut(plants); return true; } catch (err) { return false; } },
+            savePlant: async function(plant) { try { await GardenDB.plants.put(plant); return true; } catch (err) { return false; } },
+            overwriteDatabase: async function(plants) { try { await GardenDB.plants.clear(); await GardenDB.plants.bulkAdd(plants); return true; } catch (err) { return false; } },
+            deletePlant: async function(id) { try { await GardenDB.plants.delete(id); return true; } catch (err) { return false; } },
+            getConfig: async function(key) { try { const item = await GardenDB.config.get(key); return item ? item.value : null; } catch (err) { return null; } },
+            setConfig: async function(key, value) { try { await GardenDB.config.put({ key, value }); return true; } catch (err) { return false; } }
+        };
+
+        /* --- COPY FROM xml-helper.js --- */
+        const XmlHelper = {
+            parsePlants: function(xmlString) {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+                const plantNodes = xmlDoc.getElementsByTagName("PlantBase");
+                const plants = [];
+                for (let node of plantNodes) {
+                    const type = node.getAttribute("xsi:type") || "PlantBase";
+                    plants.push({
+                        id: parseInt(node.getAttribute("ID")) || 0,
+                        parentId: parseInt(node.getAttribute("ParentID")) || 0,
+                        name: node.getAttribute("Name") || "",
+                        scientificName: node.getAttribute("ScientificName") || "",
+                        leafShape: node.getAttribute("LeafShape") || "",
+                        isVariegated: node.getAttribute("IsVariegated") === "true",
+                        rootType: node.getAttribute("RootType") || "",
+                        imagePath: node.getAttribute("path_anh") || "",
+                        lastWatered: node.getAttribute("LastWatered") || "0001-01-01T00:00:00",
+                        dateAdded: node.getAttribute("DateAdded") || new Date().toISOString(),
+                        type: type,
+                        hasSilverVariegation: node.getAttribute("HasSilverVariegation") === "true",
+                        fenestrationType: node.getAttribute("FenestrationType") || "",
+                        growthHabit: node.getAttribute("GrowthHabit") || "",
+                        isHybrid: node.getAttribute("IsHybrid") === "true",
+                        satinTexture: node.getAttribute("SatinTexture") || "",
+                        hasTrunkEyes: node.getAttribute("HasTrunkEyes") !== "false",
+                        trunkDiameter: parseFloat(node.getAttribute("TrunkDiameter")) || 0,
+                        note: node.getAttribute("Note") || node.getAttribute("note") || "",
+                        propagationMethod: node.getAttribute("Propagation_Method") || "",
+                        nickName: node.getAttribute("NickName") || ""
+                    });
+                }
+                return plants;
+            },
+            toXml: function(plants) {
+                let xml = '<?xml version="1.0" encoding="utf-8"?>\n<ArrayOfPlantBase xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">\n';
+                plants.forEach(p => {
+                    const typeAttr = (p.type && p.type !== 'PlantBase') ? ` xsi:type="${p.type}"` : '';
+                    let attrs = [`ID="${p.id}"`, `ParentID="${p.parentId}"`, `Name="${this.escapeXml(p.name)}"`, `IsVariegated="${p.isVariegated}"`, `LastWatered="${p.lastWatered}"`, `DateAdded="${p.dateAdded}"` ];
+                    if (p.nickName) attrs.push(`NickName="${this.escapeXml(p.nickName)}"`);
+                    if (p.scientificName) attrs.push(`ScientificName="${this.escapeXml(p.scientificName)}"`);
+                    if (p.note) attrs.push(`Note="${this.escapeXml(p.note)}"`);
+                    if (p.propagationMethod) attrs.push(`Propagation_Method="${this.escapeXml(p.propagationMethod)}"`);
+                    if (p.type === "Epipremnum") attrs.push(`HasSilverVariegation="${p.hasSilverVariegation}"`);
+                    if (p.type === "Monstera") attrs.push(`FenestrationType="${this.escapeXml(p.fenestrationType)}"`);
+                    if (p.type === "Philodendron") { attrs.push(`GrowthHabit="${this.escapeXml(p.growthHabit)}"`); attrs.push(`IsHybrid="${p.isHybrid}"`); }
+                    if (p.type === "Scindapsus") attrs.push(`SatinTexture="${this.escapeXml(p.satinTexture)}"`);
+                    if (p.type === "Thaumatophyllum") { attrs.push(`HasTrunkEyes="${p.hasTrunkEyes}"`); attrs.push(`TrunkDiameter="${p.trunkDiameter}"`); }
+                    xml += `  <PlantBase${typeAttr} ${attrs.join(' ')} />\n`;
+                });
+                return xml + '</ArrayOfPlantBase>';
+            },
+            escapeXml: function(unsafe) { return unsafe ? String(unsafe).replace(/[<>&"']/g, m => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' }[m])) : ""; }
+        };
+
+        /* --- MODIFIED file-system.js with Fallback --- */
+        const FileSystemHelper = {
+            fileHandle: null,
+            openFile: async function() {
+                // If support exists (Desktop Chrome)
+                if (window.showOpenFilePicker) {
+                    try {
+                        const lastHandle = await DatabaseService.getConfig('lastFileHandle');
+                        const options = { types: [{ description: 'XML Files', accept: { 'text/xml': ['.xml'] } }] };
+                        if (lastHandle) options.startIn = lastHandle;
+                        
+                        [this.fileHandle] = await window.showOpenFilePicker(options);
+                        
+                        if (this.fileHandle) {
+                            await DatabaseService.setConfig('lastFileHandle', this.fileHandle);
+                        }
+                        
+                        const file = await this.fileHandle.getFile();
+                        return { name: file.name, contents: await file.text() };
+                    } catch (e) { return null; }
+                } else {
+                    // FALLBACK for Mobile
+                    return new Promise((resolve) => {
+                        const input = document.getElementById('file-input-fallback');
+                        input.onchange = async (e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                                const text = await file.text();
+                                resolve({ name: file.name, contents: text });
+                            } else resolve(null);
+                        };
+                        input.click();
+                    });
+                }
+            },
+            saveFile: async function(contents) {
+                if (this.fileHandle && window.showOpenFilePicker) {
+                    try {
+                        const writable = await this.fileHandle.createWritable();
+                        await writable.write(contents);
+                        await writable.close();
+                        return true;
+                    } catch (e) { return this.saveFileAs(contents); }
+                } else return this.saveFileAs(contents);
+            },
+            saveFileAs: async function(contents) {
+                if (window.showSaveFilePicker) {
+                    try {
+                        const lastHandle = await DatabaseService.getConfig('lastFileHandle');
+                        const options = { suggestedName: 'garden_data.xml', types: [{ accept: { 'text/xml': ['.xml'] } }] };
+                        if (lastHandle) options.startIn = lastHandle;
+                        
+                        const handle = await window.showSaveFilePicker(options);
+                        await DatabaseService.setConfig('lastFileHandle', handle);
+                        
+                        const writable = await handle.createWritable();
+                        await writable.write(contents);
+                        await writable.close();
+                        return true;
+                    } catch (e) { this.downloadFallback(contents); return true; }
+                } else { this.downloadFallback(contents); return true; }
+            },
+            downloadFallback: function(contents) {
+                const blob = new Blob([contents], { type: 'text/xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = 'garden_data.xml'; a.click();
+                URL.revokeObjectURL(url);
+            }
+        };
+
+        /* --- COPY FROM app.js --- */
+        const AppState = { plants: [], currentFilter: 'all', searchQuery: '', viewMode: 'grid', selectedPlant: null, fileName: '' };
+        const elements = {
+            plantGrid: document.getElementById('plant-grid'), genusList: document.getElementById('genus-list'),
+            searchInput: document.getElementById('search-input'), btnOpenFile: document.getElementById('btn-open-file'),
+            btnSaveFile: document.getElementById('btn-save-file'), currentFileLabel: document.getElementById('current-file-label'),
+            btnAddPlant: document.getElementById('btn-add-plant'), themeToggle: document.getElementById('theme-toggle'),
+            plantModal: document.getElementById('plant-modal'), plantForm: document.getElementById('plant-form'),
+            plantName: document.getElementById('plant-name'), plantGenus: document.getElementById('plant-genus'),
+            plantSpecies: document.getElementById('plant-species'), dynamicFields: document.getElementById('dynamic-fields'),
+            modalTitle: document.getElementById('modal-title'), viewTitle: document.getElementById('view-title'),
+            statTotal: document.getElementById('stat-total'), statWatered: document.getElementById('stat-watered'),
+            statUrgent: document.getElementById('stat-urgent'), btnExportFile: document.getElementById('btn-export-file')
+        };
+
+        async function init() {
+            elements.btnOpenFile.onclick = handleOpenFile;
+            elements.btnSaveFile.onclick = handleSaveFile;
+            elements.btnExportFile.onclick = handleExportFile;
+            elements.searchInput.oninput = handleSearch;
+            elements.btnAddPlant.onclick = () => openModal();
+            elements.themeToggle.onclick = toggleTheme;
+            elements.plantForm.onsubmit = handleFormSubmit;
+            document.querySelectorAll('.close-modal').forEach(btn => btn.onclick = closeModal);
+            elements.plantGenus.onchange = renderDynamicFields;
+            document.getElementById('plant-propagation').onchange = handlePropagationChange;
+            document.getElementById('mother-plant').onchange = handleMotherPlantChange;
+            document.getElementById('btn-filter-all').onclick = () => {
+                setActiveFilter('all', 'Tất cả cây cảnh');
+                updateFilterButtons('all');
+            };
+            document.getElementById('btn-filter-active').onclick = () => {
+                setActiveFilter('active', 'Đang trồng');
+                updateFilterButtons('active');
+            };
+
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active'); AppState.viewMode = btn.dataset.view; renderPlants();
+                };
+            });
+            const savedPlants = await DatabaseService.getAllPlants();
+            if (savedPlants.length > 0) {
+                AppState.plants = savedPlants; AppState.fileName = "Dữ liệu trình duyệt";
+                elements.currentFileLabel.textContent = AppState.fileName;
+                elements.btnSaveFile.disabled = false; renderPlants(); updateStats();
+            }
+            renderGenusNav();
+        }
+
+        async function handleOpenFile() {
+            const file = await FileSystemHelper.openFile();
+            if (file) {
+                AppState.fileName = file.name; elements.currentFileLabel.textContent = file.name;
+                elements.btnSaveFile.disabled = false;
+                AppState.plants = XmlHelper.parsePlants(file.contents);
+                await DatabaseService.overwriteDatabase(AppState.plants);
+                renderPlants(); renderGenusNav(); updateStats();
+            }
+        }
+
+        async function handleSaveFile() {
+            const xml = XmlHelper.toXml(AppState.plants);
+            if (await FileSystemHelper.saveFile(xml)) alert('Đã lưu dữ liệu!');
+        }
+
+        async function handleExportFile() {
+            const plants = await DatabaseService.getAllPlants();
+            if (!plants.length) return alert('Không có dữ liệu!');
+            const xml = XmlHelper.toXml(plants);
+            if (await FileSystemHelper.saveFileAs(xml)) alert('Đã xuất file!');
+        }
+
+        function setActiveFilter(filter, title) {
+            AppState.currentFilter = filter;
+            elements.viewTitle.textContent = title;
+            renderGenusNav();
+            renderPlants();
+        }
+
+        function updateFilterButtons(activeFilter) {
+            document.getElementById('btn-filter-all').classList.toggle('active', activeFilter === 'all');
+            document.getElementById('btn-filter-active').classList.toggle('active', activeFilter === 'active');
+        }
+
+        function renderGenusNav() {
+            const genera = ['Monstera', 'Philodendron', 'Epipremnum', 'Scindapsus', 'Thaumatophyllum'];
+            elements.genusList.innerHTML = '';
+            genera.forEach(genus => {
+                const item = document.createElement('div');
+                item.className = `nav-item ${AppState.currentFilter === genus ? 'active' : ''}`;
+                item.innerHTML = `<span class="label">${genus}</span>`;
+                item.onclick = () => { AppState.currentFilter = genus; elements.viewTitle.textContent = genus; renderGenusNav(); renderPlants(); };
+                elements.genusList.appendChild(item);
+            });
+            document.getElementById('nav-all').onclick = () => { AppState.currentFilter = 'all'; elements.viewTitle.textContent = 'Tất cả cây cảnh'; renderGenusNav(); renderPlants(); };
+            document.getElementById('nav-active').onclick = () => { AppState.currentFilter = 'active'; elements.viewTitle.textContent = 'Đang trồng'; renderGenusNav(); renderPlants(); };
+        }
+
+        function renderPlants() {
+            const speciesList = AppState.plants.filter(p => p.parentId === 0);
+            const filteredSpecies = speciesList.filter(s => {
+                const matchesGenus = (AppState.currentFilter === 'all' || AppState.currentFilter === 'active') || s.type === AppState.currentFilter;
+                const children = AppState.plants.filter(p => p.parentId === s.id);
+                if (AppState.currentFilter === 'active' && children.length === 0) return false;
+                const search = AppState.searchQuery.toLowerCase();
+                return matchesGenus && (s.name.toLowerCase().includes(search) || s.scientificName.toLowerCase().includes(search) || children.some(c => c.name.toLowerCase().includes(search)));
+            });
+            elements.plantGrid.innerHTML = filteredSpecies.length ? '' : '<p style="padding: 2rem; text-align: center; color: var(--text-gray);">Không tìm thấy dữ liệu.</p>';
+            elements.plantGrid.className = `plant-grid ${AppState.viewMode}`;
+            filteredSpecies.forEach(species => {
+                const children = AppState.plants.filter(p => p.parentId === species.id);
+                const card = document.createElement('div'); card.className = 'plant-card';
+                let childrenHtml = `<div class="plant-children"><div class="children-header"><span>Cây con (${children.length})</span><button class="btn btn-primary btn-xs" onclick="addInstanceToSpecies(${species.id})">➕ Thêm</button></div><div class="child-list">`;
+                childrenHtml += children.length ? children.map(c => `<div class="child-item"><div class="child-info"><span class="child-name">${c.nickName || shortenName(c.name)}</span><span style="font-size:0.7rem;opacity:0.6">${formatDate(c.lastWatered)}</span></div><div class="child-actions"><button class="btn btn-primary btn-xs" title="Tưới nước" onclick="waterPlant(${c.id})">💧</button><button class="btn btn-success btn-xs" title="Nhân giống" onclick="propagatePlant(${c.id})">✨</button><button class="btn btn-icon btn-xs" onclick="openModal(${c.id})">✏️</button><button class="btn btn-icon btn-xs btn-danger" onclick="deletePlant(${c.id})">🗑️</button></div></div>`).join('') : '<div style="font-size:0.8rem;text-align:center;padding:0.5rem">Chưa có cây con.</div>';
+                childrenHtml += '</div></div>';
+                card.innerHTML = `<div class="plant-image">${genusEmoji(species.type)}</div><div class="plant-info"><span class="plant-genus-tag">${species.type}</span><div class="plant-name">${species.name}</div><div class="plant-species">${species.scientificName}</div><div class="plant-footer"><button class="btn btn-icon btn-xs" onclick="openModal(${species.id})">⚙️ Sửa loài</button><span style="font-size:0.7rem;opacity:0.5">ID: ${species.id}</span></div></div>${childrenHtml}`;
+                elements.plantGrid.appendChild(card);
+            });
+        }
+
+        function shortenName(n) { if (!n) return ""; return n.split(/[\\(]/)[0].trim(); }
+        // Dùng khi đặt tên cây con: xóa phần (...) ở GIỮA tên nhưng giữ lại phần định danh (vd: _007)
+        // Ví dụ: "Glacier Pothos (Epipremnum aureum 'Glacier') _007" → "Glacier Pothos _007"
+        function instanceBaseName(n) { if (!n) return ""; return n.replace(/\s*\([^)]*\)/g, '').replace(/\s+/g, ' ').trim(); }
+        function formatDate(iso) { if (!iso || iso.startsWith('0001')) return 'Chưa tưới'; return new Date(iso).toLocaleDateString('vi-VN', {day:'2-digit', month:'2-digit'}); }
+        function genusEmoji(t) { return { Monstera:'🍃', Philodendron:'🌿', Epipremnum:'🌱', Scindapsus:'✨', Thaumatophyllum:'🌳' }[t] || '🪴'; }
+        function toggleTheme() { document.body.classList.toggle('light-mode'); document.getElementById('theme-icon').textContent = document.body.classList.contains('light-mode') ? '☀️' : '🌙'; }
+        function handleSearch(e) { AppState.searchQuery = e.target.value; renderPlants(); }
+        function addInstanceToSpecies(id) { openModal(null, id); }
+        function propagatePlant(id) { openModal(null, 0, id); }
+        function openModal(id = null, parentId = 0, propagationFromId = null) {
+            const plant = id ? AppState.plants.find(p => p.id === id) : null;
+            AppState.selectedPlant = plant;
+            AppState.currentParentId = plant ? plant.parentId : parentId;
+
+            elements.modalTitle.textContent = plant ? 'Chỉnh sửa thông tin' : 
+                                            (propagationFromId ? 'Nhân giống cây con' : 
+                                            (parentId > 0 ? 'Thêm chậu mới' : 'Thêm loài mới'));
+            elements.plantForm.reset();
+
+            // --- Bước 1: Đảm bảo các field đang mở trước khi .value (mobile Safari không cho set value trên disabled select) ---
+            elements.plantGenus.disabled = false;
+            elements.plantSpecies.readOnly = false;
+            elements.plantName.readOnly = false;
+
+            if (plant) {
+                elements.plantName.value = plant.name;
+                elements.plantGenus.value = plant.type;
+                elements.plantSpecies.value = plant.scientificName;
+                document.getElementById('plant-nickname').value = plant.nickName || '';
+                document.getElementById('plant-note').value = plant.note || '';
+                document.getElementById('plant-propagation').value = plant.propagationMethod || '';
+            } else if (propagationFromId) {
+                const mother = AppState.plants.find(p => p.id === propagationFromId);
+                if (mother) {
+                    AppState.currentParentId = mother.parentId;
+                    elements.plantGenus.value = mother.type;
+                    elements.plantSpecies.value = mother.scientificName;
+                    document.getElementById('plant-propagation').value = "Water Propagation";
+                }
+            } else if (parentId > 0) {
+                const p = AppState.plants.find(x => x.id === parentId);
+                if (p) {
+                    elements.plantGenus.value = p.type;
+                    elements.plantSpecies.value = p.scientificName;
+                }
+            }
+
+            // --- Bước 2: Lock lại SAU KHI đã điền giá trị ---
+            const isInstance = parentId > 0 || propagationFromId || (plant && plant.parentId > 0);
+            elements.plantName.readOnly = isInstance;
+            elements.plantGenus.disabled = isInstance;
+            elements.plantSpecies.readOnly = isInstance;
+
+            renderDynamicFields();
+            handlePropagationChange();
+
+            // --- Bước 3: Đặt tên CUỐI CÙNG để không bị ghi đè ---
+            if (!plant) {
+                if (propagationFromId) {
+                    const sel = document.getElementById('mother-plant');
+                    sel.value = propagationFromId;
+                    const mother = AppState.plants.find(p => p.id == propagationFromId);
+                    if (mother) {
+                        const baseName = instanceBaseName(mother.name);
+                        const childRegex = new RegExp('^' + escapeRegExp(baseName) + '\\.(\\d+)$');
+                        let maxIndex = 0;
+                        AppState.plants.forEach(p => {
+                            const match = p.name.match(childRegex);
+                            if (match) {
+                                const index = parseInt(match[1]);
+                                if (index > maxIndex) maxIndex = index;
+                            }
+                        });
+                        const nextIndex = maxIndex + 1;
+                        const indexStr = nextIndex < 10 ? `0${nextIndex}` : nextIndex;
+                        elements.plantName.value = `${baseName}.${indexStr}`;
+                    }
+                } else if (parentId > 0) {
+                    const p = AppState.plants.find(x => x.id === parentId);
+                    if (p) {
+                        const nextIndex = AppState.plants.filter(x => x.parentId === parentId).length + 1;
+                        const shortName = shortenName(p.name);
+                        elements.plantName.value = `${shortName} _00${nextIndex}`;
+                    }
+                }
+            }
+
+            elements.plantModal.style.display = 'flex';
+        }
+
+        function closeModal() { elements.plantModal.style.display = 'none'; }
+        function renderDynamicFields() {
+            const genus = elements.plantGenus.value;
+            let html = '';
+            switch(genus) {
+                case 'Epipremnum':
+                    html = `<div class="form-group"><label><input type="checkbox" id="extra-silver"> Có đột biến bạc (Cebu Blue)?</label></div>`;
+                    break;
+                case 'Monstera':
+                    html = `<div class="form-group"><label>Kiểu lỗ lá</label><input type="text" id="extra-fenestration" placeholder="Xẻ lá / Lỗ tròn..."></div>`;
+                    break;
+                case 'Philodendron':
+                    html = `
+                        <div class="form-row">
+                            <div class="form-group"><label>Kiểu mọc</label><input type="text" id="extra-habit" placeholder="Leo / Bụi..."></div>
+                            <div class="form-group"><label><input type="checkbox" id="extra-hybrid"> Là cây lai (Hybrid)?</label></div>
+                        </div>`;
+                    break;
+                case 'Scindapsus':
+                    html = `<div class="form-group"><label>Bề mặt lá</label><input type="text" id="extra-texture" placeholder="Satin / Matte / Silver..."></div>`;
+                    break;
+                case 'Thaumatophyllum':
+                    html = `
+                        <div class="form-row">
+                            <div class="form-group"><label><input type="checkbox" id="extra-eyes" checked> Có sẹo hình mắt?</label></div>
+                            <div class="form-group"><label>Đường kính thân (cm)</label><input type="number" id="extra-diameter" step="0.1"></div>
+                        </div>`;
+                    break;
+            }
+            elements.dynamicFields.innerHTML = html;
+        }
+
+        function handlePropagationChange() {
+            const method = document.getElementById('plant-propagation').value;
+            const motherContainer = document.getElementById('mother-plant-container');
+            const genus = document.getElementById('plant-genus').value;
+            if (method && method !== "") {
+                motherContainer.style.display = 'block';
+                populateMotherPlants(genus);
+            } else {
+                motherContainer.style.display = 'none';
+                applyStandardNaming();
+            }
+        }
+
+        function populateMotherPlants(genus) {
+            const motherSelect = document.getElementById('mother-plant');
+            motherSelect.innerHTML = '<option value="" disabled selected>-- Chọn cây mẹ --</option>';
+            // Filter by parentId to stay within the same species
+            const currentSpeciesId = AppState.currentParentId;
+            const mothers = AppState.plants.filter(p => 
+                p.parentId > 0 && 
+                (currentSpeciesId === 0 || p.parentId === currentSpeciesId) &&
+                (!genus || p.type.toLowerCase() === genus.toLowerCase())
+            );
+            mothers.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.id;
+                opt.textContent = m.name;
+                motherSelect.appendChild(opt);
+            });
+        }
+
+        function handleMotherPlantChange() {
+            const motherId = document.getElementById('mother-plant').value;
+            const mother = AppState.plants.find(p => p.id == motherId);
+            if (mother) {
+                const baseName = instanceBaseName(mother.name);
+                const childRegex = new RegExp('^' + escapeRegExp(baseName) + '\\.(\\d+)$');
+                let maxIndex = 0;
+                AppState.plants.forEach(p => {
+                    const match = p.name.match(childRegex);
+                    if (match) {
+                        const index = parseInt(match[1]);
+                        if (index > maxIndex) maxIndex = index;
+                    }
+                });
+                const nextIndex = maxIndex + 1;
+                const indexStr = nextIndex < 10 ? `0${nextIndex}` : nextIndex;
+                document.getElementById('plant-name').value = `${baseName}.${indexStr}`;
+            }
+        }
+
+        function applyStandardNaming() {
+            if (AppState.selectedPlant) return;
+            const genus = document.getElementById('plant-genus').value;
+            if (genus && AppState.currentParentId > 0) {
+                const parent = AppState.plants.find(p => p.id === AppState.currentParentId);
+                if (parent) {
+                    const nextIndex = AppState.plants.filter(p => p.parentId === parent.id).length + 1;
+                    const shortName = shortenName(parent.name);
+                    document.getElementById('plant-name').value = `${shortName} _00${nextIndex}`;
+                }
+            }
+        }
+
+        function escapeRegExp(string) { return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            const genus = document.getElementById('plant-genus').value;
+            if (!genus) return alert('Chọn Chi!');
+            const p = {
+                id: AppState.selectedPlant ? AppState.selectedPlant.id : Date.now(),
+                parentId: AppState.currentParentId,
+                name: elements.plantName.value.trim(), scientificName: elements.plantSpecies.value.trim(),
+                nickName: document.getElementById('plant-nickname').value.trim(), type: genus,
+                note: document.getElementById('plant-note').value.trim(),
+                propagationMethod: document.getElementById('plant-propagation').value,
+                lastWatered: AppState.selectedPlant ? AppState.selectedPlant.lastWatered : '0001-01-01T00:00:00',
+                dateAdded: AppState.selectedPlant ? AppState.selectedPlant.dateAdded : new Date().toISOString()
+            };
+            // Add dynamic fields
+            if (genus === 'Epipremnum') p.hasSilverVariegation = document.getElementById('extra-silver')?.checked || false;
+            if (genus === 'Monstera') p.fenestrationType = document.getElementById('extra-fenestration')?.value || '';
+            if (genus === 'Philodendron') { p.growthHabit = document.getElementById('extra-habit')?.value || ''; p.isHybrid = document.getElementById('extra-hybrid')?.checked || false; }
+            if (genus === 'Scindapsus') p.satinTexture = document.getElementById('extra-texture')?.value || '';
+            if (genus === 'Thaumatophyllum') { p.hasTrunkEyes = document.getElementById('extra-eyes')?.checked || true; p.trunkDiameter = parseFloat(document.getElementById('extra-diameter')?.value) || 0; }
+
+            if (AppState.selectedPlant) AppState.plants[AppState.plants.findIndex(x => x.id === p.id)] = p; else AppState.plants.push(p);
+            await DatabaseService.savePlant(p); renderPlants(); renderGenusNav(); updateStats(); closeModal();
+        }
+
+        async function waterPlant(id) { 
+            const p = AppState.plants.find(x => x.id === id); 
+            if (p) { p.lastWatered = new Date().toISOString(); await DatabaseService.savePlant(p); renderPlants(); updateStats(); } 
+        }
+
+        async function deletePlant(id) {
+            const p = AppState.plants.find(x => x.id === id); if (!p) return;
+            if (p.parentId === 0 && AppState.plants.some(x => x.parentId === id)) return alert('Vui lòng xóa các chậu thuộc loài này trước!');
+            if (confirm(`Bạn muốn xóa "${p.name}"?`)) { await DatabaseService.deletePlant(id); AppState.plants = AppState.plants.filter(x => x.id !== id); renderPlants(); updateStats(); renderGenusNav(); }
+        }
+
+        function updateStats() {
+            const species = AppState.plants.filter(p => p.parentId === 0);
+            const instances = AppState.plants.filter(p => p.parentId > 0);
+            elements.statTotal.innerHTML = `${species.length} <small style="font-size:0.75rem;opacity:0.7">(${instances.length} chậu)</small>`;
+            elements.statWatered.textContent = instances.filter(p => !p.lastWatered.startsWith('0001') && new Date(p.lastWatered).toLocaleDateString() === new Date().toLocaleDateString()).length;
+            elements.statUrgent.textContent = instances.filter(p => p.lastWatered.startsWith('0001')).length;
+        }
+
+        init();
+
+    </script>
+</body>
+</html>

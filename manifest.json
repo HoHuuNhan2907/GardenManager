@@ -1,0 +1,15 @@
+{
+  "name": "Garden Manager",
+  "short_name": "Garden",
+  "start_url": "index_mobile.html",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "icons": [
+    {
+      "src": "app_icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
