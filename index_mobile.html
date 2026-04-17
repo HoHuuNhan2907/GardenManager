@@ -813,8 +813,8 @@
                 const matchesGenus = (AppState.currentFilter === 'all' || AppState.currentFilter === 'active') || s.type === AppState.currentFilter;
                 const children = AppState.plants.filter(p => p.parentId === s.id);
                 if (AppState.currentFilter === 'active' && children.length === 0) return false;
-                const search = AppState.searchQuery.toLowerCase();
-                return matchesGenus && (s.name.toLowerCase().includes(search) || s.scientificName.toLowerCase().includes(search) || children.some(c => c.name.toLowerCase().includes(search)));
+                const search = normalizeSearchString(AppState.searchQuery);
+                return matchesGenus && (normalizeSearchString(s.name).includes(search) || normalizeSearchString(s.scientificName).includes(search) || children.some(c => normalizeSearchString(c.name).includes(search) || normalizeSearchString(c.nickName).includes(search)));
             });
             elements.plantGrid.innerHTML = filteredSpecies.length ? '' : '<p style="padding: 2rem; text-align: center; color: var(--text-gray);">Không tìm thấy dữ liệu.</p>';
             elements.plantGrid.className = `plant-grid ${AppState.viewMode}`;
@@ -829,6 +829,7 @@
             });
         }
 
+        function normalizeSearchString(str) { return String(str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase().trim(); }
         function shortenName(n) { if (!n) return ""; return n.split(/[\\(]/)[0].trim(); }
         // Dùng khi đặt tên cây con: xóa phần (...) ở GIỮA tên nhưng giữ lại phần định danh (vd: _007)
         // Ví dụ: "Glacier Pothos (Epipremnum aureum 'Glacier') _007" → "Glacier Pothos _007"
